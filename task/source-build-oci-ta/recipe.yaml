@@ -1,5 +1,5 @@
 ---
-base: ../../source-build/0.3/source-build.yaml
+base: ../source-build/source-build.yaml
 add:
   - use-source
   - use-prefetch
