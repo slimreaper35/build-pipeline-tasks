@@ -233,7 +233,7 @@ spec:
         ## otherwise, we can see this error:
         ## "fatal: detected dubious ownership in repository at '/var/workdir/source'"
         ##
-        git config --global --add safe.directory $SOURCE_DIR
+        git config --global --add safe.directory "$SOURCE_DIR"
 
         base_images=$(if [[ -f "$BASE_IMAGES_FILE" ]]; then cat "$BASE_IMAGES_FILE"; fi)
 
@@ -252,8 +252,8 @@ spec:
 
         ${app_dir}/appenv/bin/python3 ${app_dir}/source_build.py "${args[@]}"
 
-        cat "$RESULT_FILE" | jq -j ".image_url" >"$RESULT_SOURCE_IMAGE_URL"
-        cat "$RESULT_FILE" | jq -j ".image_digest" >"$RESULT_SOURCE_IMAGE_DIGEST"
+        jq -j ".image_url" <"$RESULT_FILE" >"$RESULT_SOURCE_IMAGE_URL"
+        jq -j ".image_digest" <"$RESULT_FILE" >"$RESULT_SOURCE_IMAGE_DIGEST"
         jq -j '"\(.image_url)@\(.image_digest)"' "${RESULT_FILE}" >"$RESULT_IMAGE_REF"
 
         cp "$RESULT_FILE" "$WS_BUILD_RESULT_FILE"
