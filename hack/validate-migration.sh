@@ -94,7 +94,7 @@ list_preprocessed_pipelines() {
 # Only the pipelines included in the build pipeline config are checked.
 # This function checks two aspects:
 # - whether the migration file exits successfully or not.
-# - whether the migration file modifies a pipeline. If nothing changed, it is treated a failure.
+# - whether the migration file modifies a pipeline. If nothing changed, it is logged as informational.
 # The modified pipeline is saved into a separate file with suffix '.modified'.
 check_apply_on_pipelines() {
     local -r migration_file=$1
@@ -130,7 +130,7 @@ check_apply_on_pipelines() {
         )
         info "${FUNCNAME[0]}: migration file does not modify any of pipelines ${pl_names[*]}"
     fi
-    if [ -n "$failed" ] || [ -z "$updated" ]; then
+    if [ -n "$failed" ]; then
         return 1
     else
         return 0
@@ -309,6 +309,7 @@ declare -r K8S_TEST_NS
 # This check requires a created cluster with tekton installed.
 # An easy way to set up a local cluster is running `kind create cluster'.
 check_apply_in_real_cluster() {
+    local -r migration_file=$1
     if [ -z "$IN_CLUSTER" ]; then
         info "environment variable IN_CLUSTER is not set, skip ${FUNCNAME[0]}"
         return 0
@@ -329,9 +330,8 @@ check_apply_in_real_cluster() {
     apply_logfile=$(mktemp --suffix="-${FUNCNAME[0]}")
     modified_pipeline_files=$(find "${WORK_DIR}/pipelines" -type f -name "*.modified")
     if [ -z "$modified_pipeline_files" ]; then
-        error "No modified pipeline file is found."
-        error "Please check if migrations work correctly to update pipelines."
-        exit 1
+        echo "::notice file=${migration_file},line=1::Migration script doesn't modify any of the pipeline files referenced in $BUILD_PIPELINE_CONFIG. Skipping in-cluster validation."
+        return 0
     fi
     while read -r pl_file; do
         info "apply pipeline with migrations in namespace ${K8S_TEST_NS}: ${pl_file}"
@@ -350,6 +350,8 @@ check_apply_in_real_cluster() {
 check_oci_ta_migration() {
     local migration_file=$1
     local oci_migration_file
+    local task_path=${migration_file#task/}
+    local task_name=${task_path%%/*}
 
     # Add suffix oci-ta to task name
     oci_migration_file=$(sed -E 's|task/([^/]+)(.+)|task/\1-oci-ta\2|' <<<"$migration_file")
@@ -438,7 +440,7 @@ main() {
         check_apply_on_pipelines "$migration_file"
 
         info "check apply pipelines with migrations into a cluster"
-        check_apply_in_real_cluster
+        check_apply_in_real_cluster "$migration_file"
     done
 }
 
