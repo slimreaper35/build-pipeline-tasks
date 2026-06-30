@@ -1,5 +1,5 @@
 ---
-base: ../../prefetch-dependencies/0.3/prefetch-dependencies.yaml
+base: ../prefetch-dependencies/prefetch-dependencies.yaml
 add:
   - use-source
   - create-source
