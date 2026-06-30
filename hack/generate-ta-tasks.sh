@@ -59,7 +59,9 @@ fi
 
 cd "${TASK_DIR}"
 for recipe_path in **/recipe.yaml; do
-    task_path="${recipe_path%/recipe.yaml}/$(basename "${recipe_path%/*/*}").yaml"
+    # tasks are stored at task/${task_name}/...
+    task_name="${recipe_path%%/*}"
+    task_path="${recipe_path%/*}/${task_name}.yaml"
     sponge=$(tash "${TASK_DIR}/${recipe_path}")
     echo "${sponge}" > "${task_path}"
     if ! git diff --quiet HEAD "${task_path}"; then
