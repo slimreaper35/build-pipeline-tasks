@@ -112,7 +112,7 @@ spec:
   - args:
     - use
     - $(params.SOURCE_ARTIFACT)=/var/workdir/source
-    image: quay.io/konflux-ci/build-trusted-artifacts:latest@sha256:0d5769f1a100f6b4f330cfa5d2bd22efc50bdb184e270ca84404e25c0b8fcf80
+    image: quay.io/konflux-ci/build-trusted-artifacts:latest@sha256:7c51a3530f239323442e28ea7dace8b88a14638d823d5eaa8514843c33b03c02
     name: use-trusted-artifact
   - computeResources:
       limits:
@@ -215,7 +215,7 @@ spec:
     env:
     - name: IMAGE_EXPIRES_AFTER
       value: $(params.ociArtifactExpiresAfter)
-    image: quay.io/konflux-ci/build-trusted-artifacts:latest@sha256:0d5769f1a100f6b4f330cfa5d2bd22efc50bdb184e270ca84404e25c0b8fcf80
+    image: quay.io/konflux-ci/build-trusted-artifacts:latest@sha256:7c51a3530f239323442e28ea7dace8b88a14638d823d5eaa8514843c33b03c02
     name: create-trusted-artifact
   volumes:
   - name: activation-key
