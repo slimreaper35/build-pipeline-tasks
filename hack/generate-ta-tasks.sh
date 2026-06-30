@@ -20,7 +20,8 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 TASK_DIR="$(realpath "${ROOT_DIR}/task")"
 : "${TRUSTED_ARTIFACTS=github.com/konflux-ci/build-definitions/task-generator/trusted-artifacts@latest}"
 
-tashdir="$(mktemp --dry-run)"
+tashdir="$(mktemp -d)"
+trap 'rm -rf "${tashdir}"' EXIT
 if [[ -d "${TRUSTED_ARTIFACTS}" ]]; then
     tashbin=${tashdir}/trusted-artifacts
     GOTOOLCHAIN=auto GOSUMDB=sum.golang.org go build -C "${TRUSTED_ARTIFACTS}" -o "${tashbin}"
@@ -33,7 +34,6 @@ else
     fi
     tashbin=${bin[0]}
 fi
-trap 'rm -r "${tashdir}"' EXIT
 
 tash() {
   "${tashbin}" "$@"

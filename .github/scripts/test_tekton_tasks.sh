@@ -31,7 +31,7 @@ shopt -s nullglob
 
 WORKSPACE_TEMPLATE=${BASH_SOURCE%/*/*}/resources/workspace-template.yaml
 
-if [[ $# -eq 0 || ${1} == "-h" ]]; then
+if [[ ${1:-} == "-h" ]] || [[ $# -eq 0 && -z "${TEST_ITEMS}" ]]; then
     cat <<EOF
 Error: No task directories.
 
