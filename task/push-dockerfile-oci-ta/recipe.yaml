@@ -1,5 +1,5 @@
 ---
-base: ../../push-dockerfile/0.3/push-dockerfile.yaml
+base: ../push-dockerfile/push-dockerfile.yaml
 add:
   - use-source
 preferStepTemplate: true
