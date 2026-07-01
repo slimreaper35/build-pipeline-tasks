@@ -1,0 +1,10 @@
+# Trusted Artifacts ignorelist
+# Used by hack/missing-ta-tasks.sh to skip certain tasks and workspaces
+
+# Tasks that are currently missing Trusted Artifact variant
+paths: []
+
+# Workspaces that are allowed without requiring TA variant
+workspaces:
+  - git-basic-auth
+  - netrc
