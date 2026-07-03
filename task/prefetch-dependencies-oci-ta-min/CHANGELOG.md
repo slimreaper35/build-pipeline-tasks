@@ -11,6 +11,10 @@ If that's not something you ever plan to do, consider removing this section.
 
 *Nothing yet.*
 
+## 0.4.0
+
+- Hermeto releases from 0.55.0 to 0.57.1 - <https://github.com/hermetoproject/hermeto/compare/0.55.0...0.57.1>
+
 ## 0.3.2
 
 - Added `enable-package-registry-proxy` parameter to enable use of the package registry proxy when prefetching dependencies.
