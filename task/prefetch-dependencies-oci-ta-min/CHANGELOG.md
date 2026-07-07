@@ -11,6 +11,14 @@ If that's not something you ever plan to do, consider removing this section.
 
 *Nothing yet.*
 
+## 0.4.1
+
+### Fixed
+
+- Mount the `trusted-ca` volume in the `use-trusted-artifact` and `create-trusted-artifact` steps.
+  Previously, the mount was missing, which means the task did not support container registries
+  with certificates signed by a private/self-signed CA.
+
 ## 0.4.0
 
 - Hermeto releases from 0.55.0 to 0.57.1 - <https://github.com/hermetoproject/hermeto/compare/0.55.0...0.57.1>
