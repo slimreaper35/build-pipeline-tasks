@@ -7,7 +7,7 @@ metadata:
     tekton.dev/pipelines.minVersion: 0.12.1
     tekton.dev/tags: image-build, konflux
   labels:
-    app.kubernetes.io/version: 0.4.0
+    app.kubernetes.io/version: 0.4.1
 spec:
   description: Task that prefetches project dependencies for hermetic build.
   params:
@@ -152,6 +152,11 @@ spec:
       args:
         - use
         - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+      volumeMounts:
+        - mountPath: /etc/pki/tls/certs/ca-custom-bundle.crt
+          name: trusted-ca
+          readOnly: true
+          subPath: ca-bundle.crt
     - name: prefetch-dependencies
       image: quay.io/konflux-ci/hermeto:0.57.1@sha256:de5398035bee2965a275313654f51c80e213ae460b6ec5a23e32c81efd00e67b
       volumeMounts:
@@ -246,6 +251,11 @@ spec:
         - $(params.ociStorage)
         - $(results.SOURCE_ARTIFACT.path)=/var/workdir/source
         - $(results.CACHI2_ARTIFACT.path)=/var/workdir/cachi2
+      volumeMounts:
+        - mountPath: /etc/pki/tls/certs/ca-custom-bundle.crt
+          name: trusted-ca
+          readOnly: true
+          subPath: ca-bundle.crt
       env:
         - name: IMAGE_EXPIRES_AFTER
           value: $(params.ociArtifactExpiresAfter)

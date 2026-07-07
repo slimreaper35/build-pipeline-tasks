@@ -11,6 +11,11 @@ If that's not something you ever plan to do, consider removing this section.
 
 *Nothing yet.*
 
+## 0.4.1
+
+*Version 0.4.1 only changes the `-oci-ta` variant of this task.
+Nothing changed in the base task (the one you're looking at).*
+
 ## 0.4.0
 
 - Hermeto releases from 0.55.0 to 0.57.1 - <https://github.com/hermetoproject/hermeto/compare/0.55.0...0.57.1>
