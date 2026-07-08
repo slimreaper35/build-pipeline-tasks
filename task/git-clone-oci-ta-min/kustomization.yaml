@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../git-clone-oci-ta/0.2
+  - ../git-clone-oci-ta
 
 patches:
 - path: patch.yaml

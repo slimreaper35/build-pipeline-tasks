@@ -1,5 +1,5 @@
 ---
-base: ../../git-clone/0.2/git-clone.yaml
+base: ../git-clone/git-clone.yaml
 removeParams:
   - deleteExisting
   - subdirectory
