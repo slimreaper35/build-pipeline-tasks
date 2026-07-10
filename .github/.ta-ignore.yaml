@@ -7,4 +7,6 @@ paths: []
 # Workspaces that are allowed without requiring TA variant
 workspaces:
   - git-basic-auth
+  - basic-auth
+  - ssh-directory
   - netrc
