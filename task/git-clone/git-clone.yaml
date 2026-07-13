@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   labels:
-    app.kubernetes.io/version: "0.2.3"
+    app.kubernetes.io/version: "0.2.4"
   annotations:
     tekton.dev/categories: Git
     tekton.dev/displayName: git clone
@@ -188,7 +188,7 @@ spec:
       value: $(params.noProxy)
     - name: KBC_LOG_LEVEL
       value: $(params.logLevel)
-    image: quay.io/konflux-ci/konflux-build-cli:latest@sha256:ae684894b838bf489f166b9a338916ec5eb5bd657d0640626bdf39b24f3f5508
+    image: quay.io/konflux-ci/konflux-build-cli:latest@sha256:fddbb4c2edb01a3f0065321f84cf2e4d8e483b4149e3d6f78dd0c46e85e35aef
     computeResources:
       limits:
         memory: 2Gi
