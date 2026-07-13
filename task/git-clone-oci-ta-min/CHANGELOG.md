@@ -2,6 +2,13 @@
 
 <!-- Format guidelines: https://keepachangelog.com/en/1.1.0/#how -->
 
+## 0.2.4
+
+- Updated the konflux-build-cli image to a revision that builds on top of [task-runner:2.1.0].
+  Notably, this makes the git-lfs package available in the Task.
+
+[task-runner:2.1.0]: https://github.com/konflux-ci/task-runner/blob/main/CHANGELOG.md#210
+
 ## 0.2.3
 
 - Added `symlinkCheckIgnorePattern` parameter to exclude symlink paths from the checkout symlink check [konflux-build-cli#132](https://github.com/konflux-ci/konflux-build-cli/pull/132)
