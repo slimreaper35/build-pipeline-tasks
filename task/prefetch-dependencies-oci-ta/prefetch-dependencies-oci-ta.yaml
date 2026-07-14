@@ -7,7 +7,7 @@ metadata:
     tekton.dev/pipelines.minVersion: 0.12.1
     tekton.dev/tags: image-build, konflux
   labels:
-    app.kubernetes.io/version: 0.4.1
+    app.kubernetes.io/version: 0.5.0
 spec:
   description: Task that prefetches project dependencies for hermetic build.
   params:
@@ -158,7 +158,7 @@ spec:
           readOnly: true
           subPath: ca-bundle.crt
     - name: prefetch-dependencies
-      image: quay.io/konflux-ci/hermeto:0.57.1@sha256:de5398035bee2965a275313654f51c80e213ae460b6ec5a23e32c81efd00e67b
+      image: quay.io/konflux-ci/hermeto:0.58.0@sha256:1d4eb7aeb16425cbfc06d623173379054ea667142eb26bbcdea363fa5def4340
       volumeMounts:
         - mountPath: /activation-key
           name: activation-key
