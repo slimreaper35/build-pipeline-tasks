@@ -57,40 +57,50 @@ fi
 
 # Pipeline-level parameter definitions, matching the ones added to the shared
 # pipelines by https://github.com/konflux-ci/build-definitions/pull/3670.
+# The three arrays are parallel: pipeline param name, task param name, and the
+# pipeline-level definition to insert.
+pipeline_params=("source-date-epoch" "rewrite-timestamp" "omit-history")
+task_params=("SOURCE_DATE_EPOCH" "REWRITE_TIMESTAMP" "OMIT_HISTORY")
 param_defs=(
     '{"name": "source-date-epoch", "type": "string", "default": "", "description": "Sets the image created time and the SOURCE_DATE_EPOCH build argument. On its own, it does not change file timestamps inside the layers (set rewrite-timestamp to \"true\" for that). Leave empty to keep the actual build time."}'
     '{"name": "rewrite-timestamp", "type": "string", "default": "false", "description": "When \"true\", clamp file modification times in the image layers to at most source-date-epoch. Does nothing unless source-date-epoch is set."}'
     '{"name": "omit-history", "type": "string", "default": "false", "description": "When \"true\", omit the build history (history timestamps, layer metadata, etc.) from the resulting image."}'
 )
 
-for param_def in "${param_defs[@]}"; do
-    param_name=$(yq '.name' <<<"$param_def")
-    if yq -e "${params_selector}[] | select(.name == \"${param_name}\")" "$pipeline_file" >/dev/null 2>&1; then
-        echo "Parameter ${param_name} already defined, not adding it"
-        continue
-    fi
-    echo "Adding ${param_name} parameter to ${params_selector}"
-    pmt modify -f "$pipeline_file" generic insert "$params_pmt_path" "$param_def"
-done
+# For each parameter: find the build tasks that do not set the task param yet.
+# A task param that already exists is left alone so an explicit value set by
+# the user is preserved (pmt add-param would replace it). The pipeline-level
+# definition is only added when at least one task actually gets the wiring,
+# so the migration never adds a param nothing consumes.
+for i in 0 1 2; do
+    pipeline_param=${pipeline_params[$i]}
+    task_param=${task_params[$i]}
+    param_def=${param_defs[$i]}
 
-# Wire the task params to the pipeline-level parameters. Skip any task param
-# that already exists so an explicit value set by the user is preserved
-# (pmt add-param would replace it).
-task_param_wirings=(
-    "SOURCE_DATE_EPOCH source-date-epoch"
-    "REWRITE_TIMESTAMP rewrite-timestamp"
-    "OMIT_HISTORY omit-history"
-)
-
-for task_name in "${all_build_tasks[@]}"; do
-    [[ -z "$task_name" ]] && continue
-    for wiring in "${task_param_wirings[@]}"; do
-        read -r task_param pipeline_param <<<"$wiring"
+    tasks_to_wire=()
+    for task_name in "${all_build_tasks[@]}"; do
+        [[ -z "$task_name" ]] && continue
         existing_filter="(${tasks_selector} | select(.name == \"${task_name}\")).params[] | select(.name == \"${task_param}\")"
         if yq -e "$existing_filter" "$pipeline_file" >/dev/null 2>&1; then
             echo "Task ${task_name} already sets ${task_param}, leaving it as is"
-            continue
+        else
+            tasks_to_wire+=("$task_name")
         fi
+    done
+
+    if [ ${#tasks_to_wire[@]} -eq 0 ]; then
+        echo "No build task needs ${task_param}, skipping the ${pipeline_param} parameter"
+        continue
+    fi
+
+    if yq -e "${params_selector}[] | select(.name == \"${pipeline_param}\")" "$pipeline_file" >/dev/null 2>&1; then
+        echo "Parameter ${pipeline_param} already defined, not adding it"
+    else
+        echo "Adding ${pipeline_param} parameter to ${params_selector}"
+        pmt modify -f "$pipeline_file" generic insert "$params_pmt_path" "$param_def"
+    fi
+
+    for task_name in "${tasks_to_wire[@]}"; do
         echo "Wiring ${task_param} on task ${task_name} to \$(params.${pipeline_param})"
         # shellcheck disable=SC2016
         pmt modify -f "$pipeline_file" task "${task_name}" add-param "$task_param" "\$(params.${pipeline_param})"
