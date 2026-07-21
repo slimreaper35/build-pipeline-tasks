@@ -34,11 +34,9 @@ import (
 func main() {
 	var buildahTask string
 	var buildahRemoteTask string
-	var taskVersion string
 
 	flag.StringVar(&buildahTask, "buildah-task", "", "The location of the buildah task")
 	flag.StringVar(&buildahRemoteTask, "remote-task", "", "The location of the buildah-remote task to overwrite")
-	flag.StringVar(&taskVersion, "task-version", "", "The version of the task to overwrite")
 
 	opts := zap.Options{
 		Development: true,
@@ -46,8 +44,8 @@ func main() {
 	opts.BindFlags(flag.CommandLine)
 	klog.InitFlags(flag.CommandLine)
 	flag.Parse()
-	if buildahTask == "" || buildahRemoteTask == "" || taskVersion == "" {
-		println("Must specify both buildah-task, remote-task, and task-version params")
+	if buildahTask == "" || buildahRemoteTask == "" {
+		println("Must specify both buildah-task and remote-task params")
 		os.Exit(1)
 	}
 
@@ -56,7 +54,7 @@ func main() {
 
 	decodingScheme := runtime.NewScheme()
 	utilruntime.Must(tektonapi.AddToScheme(decodingScheme))
-	convertToSsh(&task, taskVersion)
+	convertToSsh(&task)
 	y := printers.YAMLPrinter{}
 	b := bytes.Buffer{}
 	_ = y.PrintObj(&task, &b)
@@ -90,7 +88,7 @@ func streamFileYamlToTektonObj(path string, obj runtime.Object) runtime.Object {
 	return decodeBytesToTektonObjbytes(bytes, obj)
 }
 
-func convertToSsh(task *tektonapi.Task, taskVersion string) {
+func convertToSsh(task *tektonapi.Task) {
 
 	builderImage := ""
 	syncVolumes := map[string]bool{}
@@ -118,7 +116,7 @@ fi
 	for stepPod := range task.Spec.Steps {
 		ret := ""
 		step := &task.Spec.Steps[stepPod]
-		if step.Script != "" && taskVersion != "0.1" && step.Name != "build" {
+		if step.Script != "" && step.Name != "build" {
 			scriptHeaderRE := regexp.MustCompile(`^#!(/usr)?(/local)?/bin/(env )?bash(\n)+(set .*\n)*`)
 			scriptHeader := scriptHeaderRE.FindString(step.Script)
 			if scriptHeader != "" {
@@ -220,9 +218,7 @@ if ! [[ $IS_LOCALHOST ]]; then
 		podmanArgs += "    -v \"${BUILD_DIR@Q}/results/:/tekton/results:Z\" \\\n"
 		ret += "\nfi\n"
 
-		if taskVersion != "0.1" {
-			ret += adjustRemoteImage
-		}
+		ret += adjustRemoteImage
 
 		script := "scripts/script-" + step.Name + ".sh"
 
@@ -303,14 +299,6 @@ echo "Build on remote host $SSH_HOST finished"
 echo "[$(date --utc -Ins)] Final touches"
 
 buildah images`
-		if taskVersion == "0.1" || taskVersion == "0.2" || taskVersion == "0.3" {
-			ret += `
-container=$(buildah from --pull-never "$IMAGE")
-buildah mount "$container" | tee /shared/container_path
-# delete symlinks - they may point outside the container rootfs, messing with SBOM scanners
-find $(cat /shared/container_path) -xtype l -delete
-echo $container > /shared/container_name`
-		}
 		ret += `
 echo "[$(date --utc -Ins)] End remote"`
 
@@ -342,10 +330,8 @@ echo "[$(date --utc -Ins)] End remote"`
 		},
 	})
 	task.Spec.StepTemplate.Env = append(task.Spec.StepTemplate.Env, v1.EnvVar{Name: "BUILDER_IMAGE", Value: builderImage})
-	if taskVersion != "0.1" {
-		task.Spec.StepTemplate.Env = append(task.Spec.StepTemplate.Env, v1.EnvVar{Name: "PLATFORM", Value: "$(params.PLATFORM)"})
+	task.Spec.StepTemplate.Env = append(task.Spec.StepTemplate.Env, v1.EnvVar{Name: "PLATFORM", Value: "$(params.PLATFORM)"})
 
-		task.Spec.Params = append(task.Spec.Params, tektonapi.ParamSpec{Name: "IMAGE_APPEND_PLATFORM", Type: tektonapi.ParamTypeString, Description: "Whether to append a sanitized platform architecture on the IMAGE tag", Default: &tektonapi.ParamValue{StringVal: "false", Type: tektonapi.ParamTypeString}})
-		task.Spec.StepTemplate.Env = append(task.Spec.StepTemplate.Env, v1.EnvVar{Name: "IMAGE_APPEND_PLATFORM", Value: "$(params.IMAGE_APPEND_PLATFORM)"})
-	}
+	task.Spec.Params = append(task.Spec.Params, tektonapi.ParamSpec{Name: "IMAGE_APPEND_PLATFORM", Type: tektonapi.ParamTypeString, Description: "Whether to append a sanitized platform architecture on the IMAGE tag", Default: &tektonapi.ParamValue{StringVal: "false", Type: tektonapi.ParamTypeString}})
+	task.Spec.StepTemplate.Env = append(task.Spec.StepTemplate.Env, v1.EnvVar{Name: "IMAGE_APPEND_PLATFORM", Value: "$(params.IMAGE_APPEND_PLATFORM)"})
 }
