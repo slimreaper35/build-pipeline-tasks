@@ -9,3 +9,7 @@ Pipeline upgrade: Add `sast-target-dirs` pipeline-level parameter and wire it to
 ## Migration from 0.4.1 to 0.4.2
 
 Pipeline upgrade: Remove faulty paramter `sast-target-dirs` from `spec.params`. It contains invalid attributes from previous automatic updates and prevents pipeline runs to run. 
+
+## Migration from 0.4.2 to 0.4.3
+
+Pipeline upgrade: Add the opt-in reproducibility parameters `source-date-epoch`, `rewrite-timestamp`, and `omit-history` at pipeline level and wire them into the buildah build task as `SOURCE_DATE_EPOCH`, `REWRITE_TIMESTAMP`, and `OMIT_HISTORY`. All three default to off, so migrated pipelines behave exactly as before.

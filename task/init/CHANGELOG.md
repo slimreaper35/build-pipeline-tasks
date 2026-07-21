@@ -9,6 +9,10 @@ If that's not something you ever plan to do, consider removing this section.
 
 *Nothing yet.*
 
+## 0.4.3
+
+- Pipeline upgrade: Add opt-in reproducibility parameters `source-date-epoch`, `rewrite-timestamp`, and `omit-history` at pipeline level, wired into the buildah build task
+
 ## 0.4.2
 
 - Pipeline upgrade: Remove PipelineRun parameter `sast-target-dirs` with invalid attributes from PipelineRun `.spec.params` definition
