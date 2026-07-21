@@ -1,6 +1,11 @@
 # Changelog
 
-<!-- Format guidelines: https://keepachangelog.com/en/1.1.0/#how -->
+## 0.2.5
+
+- Updated the konflux-build-cli image to a revision that fixes an internal git fetch error that was
+caused by different repository submodule URL configurations per branch, resulting in a "not our ref"
+error. See [konflux-build-cli#176](https://github.com/konflux-ci/konflux-build-cli/pull/176) for more
+details.
 
 ## 0.2.4
 
