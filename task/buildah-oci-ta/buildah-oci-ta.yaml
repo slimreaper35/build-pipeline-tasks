@@ -734,7 +734,7 @@ spec:
         fi
 
         tee "$(results.IMAGE_DIGEST.path)" <"/var/workdir"/image-digest
-        echo -n "$IMAGE" | tee $(results.IMAGE_URL.path)
+        echo -n "$IMAGE" | tee "$(results.IMAGE_URL.path)"
         {
           echo -n "${IMAGE}@"
           cat "/var/workdir/image-digest"

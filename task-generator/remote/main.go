@@ -150,7 +150,9 @@ if [ -e "/ssh/error" ]; then
   cat /ssh/error
   exit 1
 fi
-export SSH_HOST=$(cat /ssh/host)
+
+SSH_HOST=$(cat /ssh/host)
+export SSH_HOST
 
 if [ "$SSH_HOST" == "localhost" ] ; then
   IS_LOCALHOST=true
@@ -176,7 +178,8 @@ if ! [[ $IS_LOCALHOST ]]; then
   fi
 
   chmod 0400 ~/.ssh/id_rsa
-  export BUILD_DIR=$(cat /ssh/user-dir)
+  BUILD_DIR=$(cat /ssh/user-dir)
+  export BUILD_DIR
   export SSH_ARGS="-o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=10"
   echo "$BUILD_DIR"
   # shellcheck disable=SC2086
