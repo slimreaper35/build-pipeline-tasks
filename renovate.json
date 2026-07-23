@@ -19,5 +19,15 @@
       ".tekton/**",
       "task/**"
     ]
+  },
+  "gomod": {
+    "packageRules": [
+      {
+        "groupName": "task-generator",
+        "schedule": [
+          "on sunday"
+        ]
+      }
+    ]
   }
 }
