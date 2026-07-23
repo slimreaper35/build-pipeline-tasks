@@ -11,6 +11,9 @@ This takes existing Image Manifests and combines them in an Image Index.
 |ALWAYS_BUILD_INDEX|Build an image index even if IMAGES is of length 1. Default true. If the image index generation is skipped, the task will forward values for params.IMAGES[0] to results.IMAGE_*. In order to properly set all results, use the repository:tag@sha256:digest format for the IMAGES parameter.|true|false|
 |STORAGE_DRIVER|Storage driver to configure for buildah|vfs|false|
 |BUILDAH_FORMAT|The format for the resulting image's mediaType. Valid values are oci (default) or docker.|oci|false|
+|SBOM_SKIP_VALIDATION|Flag to enable or disable SBOM validation before save. Validation is optional - use this if you are experiencing performance issues.|false|false|
+|caTrustConfigMapName|The name of the ConfigMap to read CA bundle data from|trusted-ca|false|
+|caTrustConfigMapKey|The name of the key in the ConfigMap that contains the CA bundle data|ca-bundle.crt|false|
 
 ## Results
 |name|description|
