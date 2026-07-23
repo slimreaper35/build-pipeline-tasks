@@ -13,5 +13,11 @@
     ".github/workflows/task-lint.yaml",
     ".github/workflows/update-shared-ci.yaml",
     ".github/workflows/versioning.yaml"
-  ]
+  ],
+  "tekton": {
+    "includePaths": [
+      ".tekton/**",
+      "task/**"
+    ]
+  }
 }
